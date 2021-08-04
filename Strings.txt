@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Académico</string>
+    <string name="ID">Número de Matricula</string>
+    <string name="nombre">Nombres Completos</string>
+    <string name="apellidos">Apellidos Completos</string>
+    <string name="edad">Edad</string>
+    <string name="Id_carrera">ID de Carrera</string>
+    <string name="registro">Registrar</string>
+    <string name="consulta">Consultar</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="modificar">Modificar</string>
+</resources>

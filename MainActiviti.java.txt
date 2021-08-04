@@ -1,0 +1,157 @@
+package com.example.acadmico;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.text.Editable;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TableLayout;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+    private EditText et_id, et_nombre, et_apellido, et_edad, et_carrera;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        et_id = (EditText)findViewById(R.id.txt_id);
+        et_nombre = (EditText)findViewById(R.id.txt_nombre);
+        et_apellido = (EditText)findViewById(R.id.txt_apellido);
+        et_edad = (EditText)findViewById(R.id.txt_edad);
+        et_carrera = (EditText)findViewById(R.id.txt_carrera);
+
+    }
+    public void registro(View view){
+        SQL admin = new SQL(this, "administracion", null, 1 );
+        SQLiteDatabase BaseDatos = admin.getWritableDatabase();
+
+        String ID = et_id.getText().toString();
+        String nombre = et_nombre.getText().toString();
+        String apellido = et_apellido.getText().toString();
+        String edad = et_edad.getText().toString();
+        String carrera = et_carrera.getText().toString();
+
+        if(!ID.isEmpty() && !nombre.isEmpty() && !apellido.isEmpty() && !edad.isEmpty() && !carrera.isEmpty()){
+            ContentValues ingreso = new ContentValues();
+            ingreso.put("ID", ID);
+            ingreso.put("Nombre", nombre);
+            ingreso.put("Apellido", apellido);
+            ingreso.put("Edad", edad);
+            ingreso.put("Carrera", carrera);
+
+            BaseDatos.insert("estudiantes", null, ingreso);
+            BaseDatos.close();
+            et_id.setText("");
+            et_nombre.setText("");
+            et_apellido.setText("");
+            et_edad.setText("");
+            et_carrera.setText("");
+
+            Toast.makeText(this, "Estudiante Registrado", Toast.LENGTH_SHORT).show();
+
+         }   else{
+            Toast.makeText(this, "Datos Incompletos", Toast.LENGTH_SHORT).show();
+         }
+    }
+
+        //Consultar -------------------------------------------------------------------
+
+    public void buscar(View view){
+        SQL admin = new SQL( this, "administracion", null, 1);
+        SQLiteDatabase BaseDatos = admin.getWritableDatabase();
+
+        String ID = et_id.getText().toString();
+
+        if(!ID.isEmpty()){
+            Cursor fila = BaseDatos.rawQuery
+                    ("select nombre, apellido, edad, carrera from estudiantes where ID =" + ID, null);
+            if(fila.moveToFirst()){
+                et_nombre.setText(fila.getString(0));
+                et_apellido.setText(fila.getString(1));
+                et_edad.setText(fila.getString(2));
+                et_carrera.setText(fila.getString(3));
+                BaseDatos.close();
+            } else {
+                Toast.makeText(this, "ID No Encontrado", Toast.LENGTH_SHORT).show();
+                BaseDatos.close();
+            }
+
+        } else {
+            Toast.makeText(this, "Ingresa el ID", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    //ELIMINAR------------------------------------------------------------------------------------
+
+    public void Eliminar(View view){
+        SQL admin = new SQL(this, "administracion", null, 1);
+        SQLiteDatabase BaseDatos = admin.getWritableDatabase();
+
+        String ID = et_id.getText().toString();
+
+        if(!ID.isEmpty()){
+
+            int cantidad = BaseDatos.delete("estudiantes", "ID=" + ID, null);
+            BaseDatos.close();
+
+            et_id.setText("");
+            et_nombre.setText("");
+            et_apellido.setText("");
+            et_edad.setText("");
+            et_carrera.setText("");
+
+            if (cantidad == 1){
+                Toast.makeText(this, "Estudiante Eliminado", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this,"Estudiante No Encontrado, Eliminación Fallida", Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            Toast.makeText(this, "Introducir ID del estudiante", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    //MODIFICAR --------------------------------------------------------------------------------------------
+
+    public void Modificar(View view) {
+        SQL admin = new SQL(this, "administracion", null, 1);
+        SQLiteDatabase BaseDatos = admin.getWritableDatabase();
+
+        String ID = et_id.getText().toString();
+        String nombre = et_nombre.getText().toString();
+        String apellido = et_apellido.getText().toString();
+        String edad = et_edad.getText().toString();
+        String carrera = et_carrera.getText().toString();
+
+        if (!ID.isEmpty() && !nombre.isEmpty() && !apellido.isEmpty() && !edad.isEmpty() && !carrera.isEmpty()){
+
+            ContentValues registro = new ContentValues();
+            registro.put("ID", ID);
+            registro.put("nombre", nombre);
+            registro.put("apellido", apellido);
+            registro.put("edad", edad);
+            registro.put("carrera", carrera);
+
+            int cantidad = BaseDatos.update("estudiantes", registro, "ID="+ ID, null);
+            BaseDatos.close();
+
+            if (cantidad == 1){
+                Toast.makeText(this, "Datos Modificados", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Estudiante No Encontrado", Toast.LENGTH_SHORT).show();
+            }
+
+
+        } else {
+            Toast.makeText(this, "Datos Incompletos", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
